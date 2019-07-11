@@ -200,6 +200,7 @@ function convertRange2html(range){
   var fontWeights = range.getFontWeights();
   var horizontalAlignments = range.getHorizontalAlignments();
   var verticalAlignments = range.getVerticalAlignments();
+  var mergedRanges = range.getMergedRanges();
   
   // https://code.google.com/p/google-apps-script-issues/issues/detail?id=4187
   // Reported widths and heights can be incorrect, with "default" values.
@@ -226,7 +227,7 @@ function convertRange2html(range){
   
   // Build HTML Table, with inline styling for each cell
   // Default cell styling appears in table or row, so only minimal overrides need to be given for each cell
-  var tableFormat = 'cellspacing="0" cellpadding="0" dir="ltr" border="1" style="width:TABLEWIDTHpx;table-layout:fixed;font-size:10pt;font-family:arial,sans,sans-serif;border-collapse:collapse;border:1px solid #ccc;font-weight:normal;color:black;background-color:white;text-align:right;text-decoration:none;font-style:normal;"';
+  var tableFormat = 'cellspacing="0" cellpadding="0" dir="ltr" border="1" style="width:TABLEWIDTHpx;table-layout:fixed;font-size:9pt;font-family:arial,sans,sans-serif;border-collapse:collapse;border:1px solid #ccc;font-weight:normal;color:black;background-color:white;text-align:right;text-decoration:none;font-style:normal;"';
    
   var html = ['<table '+tableFormat+'>'];
   // Column widths appear outside of table rows
@@ -245,7 +246,7 @@ function convertRange2html(range){
       var cellText = converter.convertCell(data[row][col],numberFormats[row][col],true);
 
       var style = 'style="' 
-                + 'padding:2px 3px; '
+                + 'padding:1px 2px; '
                 + 'color:XXX;'.replace('XXX',fontColors[row][col].replace('general-','')).replace('color:black;','')
                 + 'font-family:XXX;'.replace('XXX',fontFamilies[row][col]).replace('font-family:arial,sans,sans-serif;','')
                 + 'font-size:XXXpt;'.replace('XXX',fontSizes[row][col]).replace('font-size:10pt;','')
@@ -260,9 +261,41 @@ function convertRange2html(range){
                 + 'border:1px solid black;'  // Need this, to override caja-guest td border-bottom
                 + 'overflow:hidden;'
                 +'"';
-      html.push('<td XXX>'.replace('XXX',style)
+
+      var thisRow = range.getRow() + row;
+      var thisCol = range.getColumn() + col;
+      var rcSpan = "";
+      var isTdPartOfRange = false;
+      
+      for (var i = 0; i < mergedRanges.length; i++) {
+        var currentMergedRange = mergedRanges[i];
+        
+        var currentMergedRangeBoundaries = {
+          top : currentMergedRange.getRow(),
+          bottom : currentMergedRange.getRow() + currentMergedRange.getNumRows() - 1,
+          left : currentMergedRange.getColumn(),
+          right : currentMergedRange.getColumn() + currentMergedRange.getNumColumns() - 1
+        };
+        
+        if ((thisRow == currentMergedRangeBoundaries.top && thisCol == currentMergedRangeBoundaries.left)) {
+          // top left cell of range
+          if (currentMergedRange.getNumRows() > 0) {
+            rcSpan = " rowspan='"+currentMergedRange.getNumRows()+"'";
+          }
+          if (currentMergedRange.getNumColumns() > 0) {
+            rcSpan += " colspan='"+currentMergedRange.getNumColumns()+"'";
+          }
+        } else if ((thisRow >= currentMergedRangeBoundaries.top && thisRow <= currentMergedRangeBoundaries.bottom) && (thisCol >= currentMergedRangeBoundaries.left && thisCol <= currentMergedRangeBoundaries.right)) {
+          // falls in range
+          isTdPartOfRange = true;
+          break;
+        }
+      }
+      if (!isTdPartOfRange) {
+        html.push('<td XXX SPAN>'.replace('SPAN', rcSpan).replace('XXX',style)
                 +String(cellText)
                 +'</td>');
+      }
     }
     html.push('</tr>');
   }
