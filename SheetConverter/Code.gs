@@ -405,7 +405,7 @@ function convertDateTime_(date,format) {
   // "mm for the month of the year as two digits or the number
   // of minutes in a time. Month will be used unless this code
   // is provided with hours or seconds as part of a time." 
-  if (format.indexOf(/am\/pm|AM\/PM/) === -1) {
+  if (format.match(/am\/pm/i) == null) {
     format = format.replace(/h/g,'H');   // Hour of day, 0-23
   }
 
