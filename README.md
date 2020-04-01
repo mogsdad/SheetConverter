@@ -15,7 +15,6 @@ This script is incomplete, ignoring some types of formatting. (Feel free to fork
  - The general table style, including borders, is set in the `tableFormat` variable. Since there is no way to determine what borders are in place on a spreadsheet, it isn't possible to transfer them. (Possible enhancement: support a parameter for borders.)
  - <del>Numeric formatting can be read from a spreadsheet, but is not directly adaptable in Javascript, so numbers aren't rendered as they appear in the spreadsheet</del>. Most formats are now supported! Fractions are very slow. Custom formats can only be supported best-effort. Further extension of special negative numbering is needed (e.g. support for brackets & colours). Locale-based radix & thousand separators are also a future extension.
  - No special treatment for table headers - that would be a nice addition, allowing adoption of existing css.
- - No handling of Merged cells.
  - Overflow is not supported; wrap is applied to all cells.
  - Images and charts aren't supported.
 
