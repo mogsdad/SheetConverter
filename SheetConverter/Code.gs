@@ -310,14 +310,10 @@ function convertRange2html(range){
       }
       
       if (!isTdPartOfRange) {
-        Logger.log("row - " + row + " col - " + col);
-        Logger.log("urlLinks - " + (urlLinks[row][col]));
         var link = (urlLinks[row][col]);
         if (link !== 0) {
-              Logger.log("Worked");
               var link = (urlLinks[row][col]);
               cellText = '<a href="' + link + '">' + cellText + '</a>';
-              Logger
          }
         html.push('<td XXX SPAN>'.replace('SPAN', rcSpan).replace('XXX',style)
                 +String(cellText)
