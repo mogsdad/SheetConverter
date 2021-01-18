@@ -222,6 +222,23 @@ function convertRange2html(range){
   // Get formats from range
   var numberFormats = range.getNumberFormats();
 
+  // Get the UrlLinks for range
+    var urlLinks = [];
+    for (var row=startRow; row<=lastRow; row++) {
+       var w = [];
+       for (var col=startCol; col<=lastCol; col++) {
+          var url = null;
+          var url = sheet.getRange(row,col).getRichTextValue();
+          var urlString = null;
+          if (url){
+            urlString = sheet.getRange(row,col).getRichTextValue().getLinkUrl();
+          }
+          if ((url == null)|(urlString ==null)) { urlString = 0;}
+          w.push(urlString);
+          }
+       urlLinks.push(w);
+       }
+    
   // Future consideration...
   //var wraps = range.getWraps();
   
@@ -291,11 +308,17 @@ function convertRange2html(range){
           break;
         }
       }
+      
       if (!isTdPartOfRange) {
+        var link = (urlLinks[row][col]);
+        if (link !== 0) {
+              var link = (urlLinks[row][col]);
+              cellText = '<a href="' + link + '">' + cellText + '</a>';
+         }
         html.push('<td XXX SPAN>'.replace('SPAN', rcSpan).replace('XXX',style)
                 +String(cellText)
                 +'</td>');
-      }
+                }
     }
     html.push('</tr>');
   }
